@@ -1,7 +1,26 @@
 <?php
-$host = $_SERVER['HTTP_HOST'];
+
 $title = getenv('TITLE');
-if (!$title) $title = $host;
+
+if (!$title) {
+	if (file_exists(__DIR__.'/../.env')) {
+		$content = file_get_contents(__DIR__.'/../.env');
+		$lines = explode("\n", $content);
+		
+		foreach ($lines AS $line) {
+			$parts = explode('=', $line);
+			
+			if ($parts[0] == 'TITLE' && isset($parts[1])) {
+				$title = $parts[1];
+			}
+		}
+	}
+	
+	if (!$title) {
+		$title = $_SERVER['HTTP_HOST'];
+	}
+}
+
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
