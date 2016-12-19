@@ -1,8 +1,24 @@
 <?php
 
-$title = getenv('TITLE');
-$redirect = getenv('REDIRECT');
-$redirectPermanent = getenv('REDIRECT_PERMANENT', false);
+$env = [];
+
+if (file_exists(__DIR__.'/../.env')) {
+	$content = file_get_contents(__DIR__.'/../.env');
+	$lines = explode("\n", $content);
+
+	foreach ($lines AS $line) {
+		$parts = explode('=', $line);
+
+		if (isset($parts[1])) {
+			$env[$parts[0]] = $parts[1];
+			$title = $parts[1];
+		}
+	}
+}
+
+$title = isset($env['TITLE']) ? $env['TITLE'] : null;
+$redirect = isset($env['REDIRECT']) ? $env['REDIRECT'] : null;
+$redirectPermanent = isset($env['REDIRECT_PERMANENT']) ? $env['REDIRECT_PERMANENT'] : false;
 
 if (!is_null($redirect)) {
 	header('Location: ' . $redirect, true, $redirectPermanent ? 301 : 302);
@@ -10,22 +26,7 @@ if (!is_null($redirect)) {
 }
 
 if (!$title) {
-	if (file_exists(__DIR__.'/../.env')) {
-		$content = file_get_contents(__DIR__.'/../.env');
-		$lines = explode("\n", $content);
-		
-		foreach ($lines AS $line) {
-			$parts = explode('=', $line);
-			
-			if ($parts[0] == 'TITLE' && isset($parts[1])) {
-				$title = $parts[1];
-			}
-		}
-	}
-	
-	if (!$title) {
-		$title = $_SERVER['HTTP_HOST'];
-	}
+	$title = $_SERVER['HTTP_HOST'];
 }
 
 ?><!DOCTYPE html>
