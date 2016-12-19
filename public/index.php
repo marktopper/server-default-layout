@@ -1,6 +1,13 @@
 <?php
 
 $title = getenv('TITLE');
+$redirect = getenv('REDIRECT');
+$redirectPermanent = getenv('REDIRECT_PERMANENT', false);
+
+if (!is_null($redirect)) {
+	header('Location: ' . $redirect, true, $redirectPermanent ? 301 : 302);
+	exit;
+}
 
 if (!$title) {
 	if (file_exists(__DIR__.'/../.env')) {
